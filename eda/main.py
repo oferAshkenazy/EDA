@@ -29,7 +29,8 @@ else:
     st.write("No file uploaded yet!")
 
 while create_report:
-    gs.write(st,df)
+
     correlation_matrix = cm.get_correlation_matrix(df)
-    st.write(cm.find_correlated_columns(correlation_matrix))
+    hcm=cm.find_correlated_columns(correlation_matrix)
+    gs.write(st, df,hcm)
     create_report=False

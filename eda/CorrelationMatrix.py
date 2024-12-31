@@ -30,12 +30,16 @@ def create_correlation_matrix(df):
 def get_correlation_matrix(df):
     return create_correlation_matrix(df)
 
+def get_matrix_cell_value(cm:pandas.DataFrame,column,row):
+    return abs(cm.loc[column,row])
+
 def find_correlated_columns(cm:pandas.DataFrame):
+
     corr_columns=[]
-    for column in cm.columns:
-        for row in cm.columns:
-            corr_columns.append(cm[column,row].values)
 
+    [corr_columns.append([column,row])
+        for column in cm.columns
+            for row in cm.columns
+                if (get_matrix_cell_value(cm,column,row)>correlation_threshold() and column!=row)]
     return corr_columns
-
 
