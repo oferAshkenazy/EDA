@@ -67,14 +67,34 @@ def negative_column_per(df,column_name):
         return round((negative_column(df,column_name) / len(df[column_name])) * 100, 2)
     return 0
 
+def column_type(df,column_name):
+    type=list()
+    if gs.check_uniform_column(df, column_name):
+        type.append('Uniform')
+    if gs.unique_column(df, column_name):
+        type.append('Unique')
+    if column_name in gs.categorical_columns(df):
+        type.append('Category')
+    if gs.zeros_column(df, column_name):
+        type.append('Zeros')
+    if column_name in gs.numerical_columns(df):
+        type.append('Numeric')
+    if column_name in gs.boolean_columns(df):
+        type.append('Boolean')
+    if column_name in gs.datetime_columns(df):
+        type.append('Datetime')
+
+    return type
+
 def analyze_column(df, column_name,hcm):
     result = {
+        'Types': column_type(df,column_name),
         'Uniform':gs.check_uniform_column(df,column_name),
         'Unique': gs.unique_column(df,column_name),
         'Unique Count': df[column_name].nunique(),  # Count of unique values
         'Unique %': round(df[column_name].nunique() / df[column_name].value_counts().sum() * 100,2),  # Percentage of unique values
-        'Has Missing': bool(df[column_name].isnull().any()),  # Check for missing values
-        'Has Missing %': df[column_name].isnull().sum() / len(df) * 100,  # Percentage of missing values
+        'Missing': bool(df[column_name].isnull().any()),  # Check for missing values
+        'Missing %': df[column_name].isnull().sum() / len(df) * 100,  # Percentage of missing values
         'Missing Count': int(df[column_name].isnull().sum()),  # Count of missing values
         'Mean': mean_column(df,column_name),  # Mean value
         'Median': median_column(df,column_name),  # Median value
@@ -90,6 +110,8 @@ def analyze_column(df, column_name,hcm):
     }
 
     return result
+
+
 '''
     print(result)
     if (column_name in numerical_columns(df)):
