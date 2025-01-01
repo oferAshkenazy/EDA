@@ -1,4 +1,7 @@
 import pandas
+import streamlit
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def unique_threshold_column():
     return 5
@@ -43,3 +46,15 @@ def find_correlated_columns(cm:pandas.DataFrame):
                 if (get_matrix_cell_value(cm,column,row)>correlation_threshold() and column!=row)]
     return corr_columns
 
+def display_correlation_matrix(correlation_matrix,st:streamlit):
+    map, table = st.tabs(["Heat Map", "Heat Table"])
+
+    with map:
+
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+        plt.title("Correlation Matrix Heatmap")
+        st.pyplot(plt)
+
+    with table:
+        st.write(correlation_matrix)

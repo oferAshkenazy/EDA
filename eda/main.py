@@ -45,13 +45,16 @@ def display_category_histogram(df,column_name,st:streamlit):
     plt.title("Histogram for Categorical Column", fontsize=16)
     plt.ylabel("Count", fontsize=14)
     plt.xlabel("Categories", fontsize=14)
-    
+
     # Show the plot
     st.pyplot(plt)
 
 
 def display_numeric_histogram(df,column_name,st:streamlit):
     calculated_bin= int(df[column_name].max()/20)
+    if calculated_bin == 0:
+        calculated_bin = 1
+
     bin_edges = range(int(df[column_name].min()), int(df[column_name].max()) + calculated_bin, calculated_bin)  # Bins of size 10
     df["Binned"] = pd.cut(df[column_name], bins=bin_edges, right=False)
     if calculated_bin==0:
@@ -127,4 +130,7 @@ while create_report:
 
     selected_option  = st.selectbox("Select a person:", list(data_dict.keys()))
     process_selection(selected_option )
+
+    st.write('Correlations:')
+    cm.display_correlation_matrix(correlation_matrix, st)
     create_report=False
