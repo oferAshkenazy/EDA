@@ -63,6 +63,8 @@ def write_missing_values(st:streamlit,df):
             st.write(column + ' has ' + str(df[column].isna().sum()) + '('+str(round(df[column].isna().sum()/len(df)*100,2))+'%)' + ' missing values')
 
 def check_uniform_column(df:pd.DataFrame,column_name):
+    if column_name not in numerical_columns(df):
+        return False
     # Statistical Test for Uniform Distribution
     # Normalize column_name to [0, 1] for the uniformity test
     normalized_data = (df[column_name] - df[column_name].min()) / (
