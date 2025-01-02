@@ -73,9 +73,15 @@ def display_correlation_matrix(correlation_matrix,st:streamlit,df):
     with graphs:
         display_correlation_graph(st,correlation_matrix)
 
-def display_interactions_plot(df,st,col_x,col_y):
+def display_interactions_plot(df,st,col_x,col_y,col_hue):
     plt.figure(figsize=(4, 2))
     st.write(str(col_x)+'      '+str(col_y))
-    sns.scatterplot(x=col_x, y=col_y, data=df)
+    if len(col_hue)==0:
+        sns.scatterplot(x=col_x, y=col_y, data=df)
+    else:
+        sns.scatterplot(x=col_x, y=col_y, data=df,hue=col_hue)
+
     plt.title(col_x + " vs " + col_y)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0)
+    plt.tight_layout()
     st.pyplot(plt)

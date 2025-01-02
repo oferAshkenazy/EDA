@@ -17,9 +17,13 @@ df=pd.DataFrame|None
 create_report=False
 selected_option_y=str|None
 selected_option_x=str|None
+original_columns=list()
 
 st.text("choose csv file")
 uploaded_file = st.file_uploader("Choose a file", type=["csv"])
+
+def get_original_columns():
+    return original_columns
 
 def get_dataframe():
     return df
@@ -123,13 +127,10 @@ def process_selection(option):
         write_column_data(option,result)
 
 
-def on_change_handler():
-    # Informational message to confirm the callback
-    st.info("Interaction plot will be updated.")
-    cm.display_interactions_plot(df, st, st.session_state["select_x"], st.session_state["select_y"])
 
 # Main logic
 while create_report:
+    original_columns=df.columns
     correlation_matrix = cm.get_correlation_matrix(df)
     hcm = cm.find_correlated_columns(correlation_matrix)
     gs.write(st, df, hcm)
@@ -147,22 +148,27 @@ while create_report:
 
     # First selectbox with callback
     selected_option_x = st.selectbox(
-        "Select a column:",
-        list(gs.numerical_columns(df)),
-        key="select_x",
-        on_change=on_change_handler,
+        "Select a column X:",
+        list(get_original_columns()),
+        key="select_x"
     )
 
     # Second selectbox, dependent on the first
     selected_option_y = st.selectbox(
-        "Select a column:",
-        list(gs.numerical_columns(df)),
-        key="select_y",
+        "Select a column Y:",
+        list(get_original_columns()),
+        key="select_y"
+    )
+
+    selected_option_hue = st.selectbox(
+        "Select a column 'hue':",
+        list(['']+[name for name in gs.categorical_columns(df) if "_numeric" not in name]),
+        key="select_hue"
     )
 
     # Trigger interaction plot on change
-    if "select_x" in st.session_state and "select_y" in st.session_state:
-        cm.display_interactions_plot(df, st, st.session_state["select_x"], st.session_state["select_y"])
+    #if "select_x" in st.session_state and "select_y" in st.session_state:
+    cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
 
     st.write("Missing values:")
 
