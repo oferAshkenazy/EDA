@@ -7,14 +7,19 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import math
 import numpy as np
+from streamlit.file_util import streamlit_write
+
 import GeneralStatistics as gs
 import CorrelationMatrix as cm
 import ColumnStatistics as cs
 
-st.text("choose csv file")
-uploaded_file = st.file_uploader("Choose a file", type=["csv"])
 df=pd.DataFrame|None
 create_report=False
+selected_option_y=str|None
+selected_option_x=str|None
+
+st.text("choose csv file")
+uploaded_file = st.file_uploader("Choose a file", type=["csv"])
 
 def get_dataframe():
     return df
@@ -113,27 +118,52 @@ def write_column_data(column_name,data):
     elif column_name in gs.numerical_columns(df):
         display_numeric_histogram(df, column_name,st)
 
-    #st.write(data)
-
-while create_report:
-
-    correlation_matrix = cm.get_correlation_matrix(df)
-    hcm=cm.find_correlated_columns(correlation_matrix)
-    gs.write(st, df,hcm)
-    st.write("Variables:")
-
-    def process_selection(option):
+def process_selection(option):
         result = cs.analyze_column(df, option,hcm)
         write_column_data(option,result)
 
-    data_dict = {column_name:column_name for column_name in gs.columns(df) if column_name.find('_numeric')<0}
 
-    selected_option  = st.selectbox("Select a person:", list(data_dict.keys()))
-    process_selection(selected_option )
+def on_change_handler():
+    # Informational message to confirm the callback
+    st.info("Interaction plot will be updated.")
+    cm.display_interactions_plot(df, st, st.session_state["select_x"], st.session_state["select_y"])
 
-    st.write('Correlations:')
-    cm.display_correlation_matrix(correlation_matrix, st,df)
+# Main logic
+while create_report:
+    correlation_matrix = cm.get_correlation_matrix(df)
+    hcm = cm.find_correlated_columns(correlation_matrix)
+    gs.write(st, df, hcm)
+    st.write("Variables:")
 
-    st.write('Missing values:')
+    data_dict = {column_name: column_name for column_name in gs.columns(df) if "_numeric" not in column_name}
 
-    create_report=False
+    selected_option = st.selectbox("Select a variable:", list(data_dict.keys()), key="select_variable")
+    process_selection(selected_option)
+
+    st.write("Correlations:")
+    cm.display_correlation_matrix(correlation_matrix, st, df)
+
+    st.write("Interactions:")
+
+    # First selectbox with callback
+    selected_option_x = st.selectbox(
+        "Select a column:",
+        list(gs.numerical_columns(df)),
+        key="select_x",
+        on_change=on_change_handler,
+    )
+
+    # Second selectbox, dependent on the first
+    selected_option_y = st.selectbox(
+        "Select a column:",
+        list(gs.numerical_columns(df)),
+        key="select_y",
+    )
+
+    # Trigger interaction plot on change
+    if "select_x" in st.session_state and "select_y" in st.session_state:
+        cm.display_interactions_plot(df, st, st.session_state["select_x"], st.session_state["select_y"])
+
+    st.write("Missing values:")
+
+    create_report = False
