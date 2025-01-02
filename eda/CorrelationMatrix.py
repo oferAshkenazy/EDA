@@ -51,14 +51,10 @@ def find_correlated_columns(cm:pandas.DataFrame):
                 if (get_matrix_cell_value(cm,column,row)>correlation_threshold() and column!=row)]
     return corr_columns
 
-def display_correlation_graph(st:streamlit,df):
-    # Select numeric columns for the pair plot
-    numeric_cols = gs.numerical_columns(df)
-
-    # Create a pair plot for the selected numeric columns
-    pair_plot = sns.pairplot(df[numeric_cols], diag_kind="kde", corner=False, palette="viridis")
-
-    # Show the plot
+def display_correlation_graph(st:streamlit,correlation_matrix):
+    nested_list = find_correlated_columns(correlation_matrix)
+    unique_list = list(dict.fromkeys(element for sublist in nested_list for element in sublist))
+    pair_plot = sns.pairplot(correlation_matrix[unique_list], diag_kind="kde", corner=True, palette="viridis")
     st.pyplot(plt)
 
 def display_correlation_matrix(correlation_matrix,st:streamlit,df):
