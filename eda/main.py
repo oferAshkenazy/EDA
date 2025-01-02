@@ -12,6 +12,7 @@ from streamlit.file_util import streamlit_write
 import GeneralStatistics as gs
 import CorrelationMatrix as cm
 import ColumnStatistics as cs
+import Missing as m
 
 df=pd.DataFrame|None
 create_report=False
@@ -22,6 +23,7 @@ original_columns=list()
 st.text("choose csv file")
 uploaded_file = st.file_uploader("Choose a file", type=["csv"])
 
+@st.cache_data
 def get_original_columns():
     return original_columns
 
@@ -122,6 +124,7 @@ def write_column_data(column_name,data):
     elif column_name in gs.numerical_columns(df):
         display_numeric_histogram(df, column_name,st)
 
+
 def process_selection(option):
         result = cs.analyze_column(df, option,hcm)
         write_column_data(option,result)
@@ -146,14 +149,12 @@ while create_report:
 
     st.write("Interactions:")
 
-    # First selectbox with callback
     selected_option_x = st.selectbox(
         "Select a column X:",
         list(get_original_columns()),
         key="select_x"
     )
 
-    # Second selectbox, dependent on the first
     selected_option_y = st.selectbox(
         "Select a column Y:",
         list(get_original_columns()),
@@ -166,10 +167,9 @@ while create_report:
         key="select_hue"
     )
 
-    # Trigger interaction plot on change
-    #if "select_x" in st.session_state and "select_y" in st.session_state:
-    cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
+    if st.button("Click"):
+        cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
 
     st.write("Missing values:")
-
+    m.missing_values_histogram(df,st)
     create_report = False
