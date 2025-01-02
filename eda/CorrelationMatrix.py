@@ -1,7 +1,12 @@
+import pandas as pd
 import pandas
 import streamlit
 import seaborn as sns
 import matplotlib.pyplot as plt
+import GeneralStatistics as gs
+
+def replace_numeric(name):
+  return str(name).replace('_numeric','')
 
 def unique_threshold_column():
     return 5
@@ -46,8 +51,18 @@ def find_correlated_columns(cm:pandas.DataFrame):
                 if (get_matrix_cell_value(cm,column,row)>correlation_threshold() and column!=row)]
     return corr_columns
 
-def display_correlation_matrix(correlation_matrix,st:streamlit):
-    map, table = st.tabs(["Heat Map", "Heat Table"])
+def display_correlation_graph(st:streamlit,df):
+    # Select numeric columns for the pair plot
+    numeric_cols = gs.numerical_columns(df)
+
+    # Create a pair plot for the selected numeric columns
+    pair_plot = sns.pairplot(df[numeric_cols], diag_kind="kde", corner=False, palette="viridis")
+
+    # Show the plot
+    st.pyplot(plt)
+
+def display_correlation_matrix(correlation_matrix,st:streamlit,df):
+    map, table,graphs = st.tabs(["Heat Map", "Heat Table","Graphs"])
 
     with map:
 
@@ -58,3 +73,6 @@ def display_correlation_matrix(correlation_matrix,st:streamlit):
 
     with table:
         st.write(correlation_matrix)
+
+    with graphs:
+        display_correlation_graph(st,correlation_matrix)

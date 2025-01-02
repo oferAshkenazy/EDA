@@ -132,5 +132,8 @@ while create_report:
     process_selection(selected_option )
 
     st.write('Correlations:')
-    cm.display_correlation_matrix(correlation_matrix, st)
+    cm.display_correlation_matrix(correlation_matrix, st,df)
+
+    st.write('Missing values:')
+
     create_report=False
