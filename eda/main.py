@@ -1,17 +1,12 @@
-from operator import index
-
-import streamlit
-import streamlit as st
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-import math
-import numpy as np
-from streamlit.file_util import streamlit_write
+import streamlit
+import streamlit as st
 
-import GeneralStatistics as gs
-import CorrelationMatrix as cm
 import ColumnStatistics as cs
+import CorrelationMatrix as cm
+import GeneralStatistics as gs
 import Missing as m
 
 df=pd.DataFrame|None
@@ -20,10 +15,29 @@ selected_option_y=str|None
 selected_option_x=str|None
 original_columns=list()
 
+st.markdown(
+    """
+    <style>
+    /* Adjust the Streamlit app container */
+    .block-container {
+        max-width: 90%;
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+    .dataframe-table {
+        font-size: 12px;  /* Adjust font size */
+        color: #333;      /* Optional: Text color */
+        width: 100%;      /* Optional: Adjust table width */
+    }
+    
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.text("choose csv file")
 uploaded_file = st.file_uploader("Choose a file", type=["csv"])
 
-@st.cache_data
 def get_original_columns():
     return original_columns
 
@@ -38,7 +52,10 @@ if uploaded_file is not None:
     if uploaded_file.name.endswith(".csv"):
         df = pd.read_csv(uploaded_file)
         st.write("Data from CSV file:")
-        st.dataframe(df.head())
+        st.markdown(
+            df.head().to_html(classes="dataframe-table", index=False),
+            unsafe_allow_html=True,
+        )
         create_report=True
 else:
     st.write("No file uploaded yet!")
@@ -68,8 +85,6 @@ def display_numeric_histogram(df,column_name,st:streamlit):
 
     bin_edges = range(int(df[column_name].min()), int(df[column_name].max()) + calculated_bin, calculated_bin)  # Bins of size 10
     df["Binned"] = pd.cut(df[column_name], bins=bin_edges, right=False)
-    if calculated_bin==0:
-        calculated_bin=1
 
     # Calculate the counts of unique values
     value_counts = df["Binned"].value_counts().reset_index()
@@ -145,7 +160,7 @@ while create_report:
     process_selection(selected_option)
 
     st.write("Correlations:")
-    cm.display_correlation_matrix(correlation_matrix, st, df)
+    cm.display_correlation_matrix(correlation_matrix, st)
 
     st.write("Interactions:")
 

@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import GeneralStatistics as gs
 from eda.GeneralStatistics import numerical_columns
@@ -68,23 +67,23 @@ def negative_column_per(df,column_name):
     return 0
 
 def column_type(df,column_name):
-    type=list()
+    type_list=list()
     if gs.check_uniform_column(df, column_name):
-        type.append('Uniform')
+        type_list.append('Uniform')
     if gs.unique_column(df, column_name):
-        type.append('Unique')
+        type_list.append('Unique')
     if column_name in gs.categorical_columns(df):
-        type.append('Category')
+        type_list.append('Category')
     if gs.zeros_column(df, column_name):
-        type.append('Zeros')
+        type_list.append('Zeros')
     if column_name in gs.numerical_columns(df):
-        type.append('Numeric')
+        type_list.append('Numeric')
     if column_name in gs.boolean_columns(df):
-        type.append('Boolean')
+        type_list.append('Boolean')
     if column_name in gs.datetime_columns(df):
-        type.append('Datetime')
+        type_list.append('Datetime')
 
-    return type
+    return type_list
 
 def analyze_column(df, column_name,hcm):
     result = {
@@ -110,19 +109,4 @@ def analyze_column(df, column_name,hcm):
     }
 
     return result
-
-
-'''
-    print(result)
-    if (column_name in numerical_columns(df)):
-      plt.figure(figsize=(4, 2))
-      sns.histplot(df[column_name], kde=True)
-      plt.title(column_name + " Histogram")
-      plt.xlabel(column_name)
-
-    if (column_name in categorical_columns(df)):
-      plt.figure(figsize=(4, 2))
-      sns.countplot(x=df[column_name])
-      plt.title(column_name + " Count Plot")
-'''
 

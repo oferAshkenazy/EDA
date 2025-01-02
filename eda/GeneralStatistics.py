@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit
-import streamlit as st
 import CorrelationMatrix as cm
 from scipy.stats import kstest
 
@@ -81,10 +80,9 @@ def check_uniform_column(df:pd.DataFrame,column_name):
 
 def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame):
     st.markdown(
-        "<h1 style='font-size: 50px; text-align: center; color: black;'>Overview</h1>",
+        "<h1 style='font-size: 30px; text-align: center; color: black;'>Overview</h1>",
         unsafe_allow_html=True
     )
-    #st.title("Overview")
 
     statistics, alerts = st.tabs(["Dataset Statistics", "Alerts"])
 

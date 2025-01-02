@@ -1,9 +1,7 @@
-import pandas as pd
 import pandas
 import streamlit
 import seaborn as sns
 import matplotlib.pyplot as plt
-import GeneralStatistics as gs
 
 def replace_numeric(name):
   return str(name).replace('_numeric','')
@@ -57,7 +55,7 @@ def display_correlation_graph(st:streamlit,correlation_matrix):
     pair_plot = sns.pairplot(correlation_matrix[unique_list], diag_kind="kde", corner=True, palette="viridis")
     st.pyplot(plt)
 
-def display_correlation_matrix(correlation_matrix,st:streamlit,df):
+def display_correlation_matrix(correlation_matrix,st:streamlit):
     map, table,graphs = st.tabs(["Heat Map", "Heat Table","Graphs"])
 
     with map:
