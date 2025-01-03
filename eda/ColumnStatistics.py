@@ -98,7 +98,7 @@ def analyze_column(df, column_name,hcm):
         'Mean': mean_column(df,column_name),  # Mean value
         'Median': median_column(df,column_name),  # Median value
         'Minimum': int(minimum_column(df,column_name)),  # Minimum value
-        'Maximum': int(maximum_column(df,column_name)),  # Maximum value
+        'Maximum': int(maximum_column(df,column_name)),  #data st Maximum value
         'Standard Deviation': round(standard_deviation_column(df,column_name),2),  # Standard deviation
         'Zeros': int((df[column_name] == 0).sum()),
         'Zeros %': round(((df[column_name] == 0).sum() / len(df[column_name])) * 100,2),

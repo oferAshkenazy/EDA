@@ -118,7 +118,7 @@ def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame):
 
     with alerts:
         st.markdown(
-            "<h2 style='font-size: 22px; text-align: center; color: red;'>Alerts :</h2>",
+            "<h2 style='font-size: 22px; text-align: center; color: DarkOrange ;'>Alerts :</h2>",
             unsafe_allow_html=True
         )
         col3, col4 = st.columns(2)
@@ -138,20 +138,21 @@ def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame):
 
         with col4:
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Uniformly :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: DarkRed;'><b>Uniformly :</b></div>",
                 unsafe_allow_html=True
             )
             [st.write(column_name+ ' is uniformly distributed') for column_name in numerical_columns(df) if check_uniform_column(df,column_name)]
 
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Unique :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: DarkOrange ;'><b>Unique :</b></div>",
                 unsafe_allow_html=True
             )
             [st.write(column_name+ ' has unique values') for column_name in columns(df) if unique_column(df,column_name)]
 
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Unique :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: Tomato;'><b>Unique :</b></div>",
                 unsafe_allow_html=True
             )
+
             [st.write(column_name+ ' has '+ str(zeros_column_sum(df,column_name)) + ' ('+ str(zeros_column_per(df,column_name))  +') Zeros') for column_name in numerical_columns(df) if zeros_column(df,column_name)]
 

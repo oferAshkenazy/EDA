@@ -124,38 +124,53 @@ def display_numeric_histogram(df,column_name,st:streamlit):
 
 
 def write_column_data(column_name,data):
-    st.write('Data for column ' + column_name)
-    types=''
+    types = ''
     for item in data['Types']:
-        types+=item.upper()+' '
-    st.write(types)
+        types += item.upper() + ' '
+
+    st.markdown(
+        "<h1 style='font-size: 16px; text-align: center; color: white;background-color:blue;width:100%'>" + types + "</h1>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+            "<h1 style='font-size: 16px; text-align: left; color: green;width:100%'>Data for column " + column_name + ":</h1>",
+            unsafe_allow_html=True
+    )
 
 
-    if data['Unique']:
-        st.write('Distinct :'+str(data['Unique Count']))
-        st.write('Distinct (%):'+str(data['Unique %']))
 
-    if data['Missing']:
-        st.write('Missing :'+str(data['Missing Count']))
-        st.write('Missing %:'+str(round(data['Missing %'],2)))
+    col5,col6 = st.columns(2)
 
-    st.write('Mean :'+str(data['Mean']))
-    st.write('Median :'+str(data['Median']))
-    st.write('Minimum :'+str(data['Minimum']))
-    st.write('Maximum :'+str(data['Maximum']))
-    st.write('Standard Deviation :'+str(data['Standard Deviation']))
-    st.write('Zeros :'+str(data['Zeros']))
-    st.write('Zeros % :'+str(data['Zeros %']))
-    st.write('Negative :'+str(data['Negative']))
-    st.write('Negative % :'+str(data['Negative %']))
-    st.write('Is Text :'+str(data['Is Text']))
-    if data['High Correlation']:
-        st.write('High Correlation :'+str(data['High Correlation']))
+    with col5:
+        if data['Unique']:
+            st.write('Distinct :'+str(data['Unique Count']))
+            st.write('Distinct (%):'+str(data['Unique %']))
+
+        if data['Missing']:
+            st.write('Missing :'+str(data['Missing Count']))
+            st.write('Missing %:'+str(round(data['Missing %'],2)))
+
+        st.write('Mean :'+str(data['Mean']))
+        st.write('Median :'+str(data['Median']))
+        st.write('Minimum :'+str(data['Minimum']))
+        st.write('Maximum :'+str(data['Maximum']))
+        st.write('Standard Deviation :'+str(data['Standard Deviation']))
+
+    with col6:
+        st.write('Zeros :'+str(data['Zeros']))
+        st.write('Zeros % :'+str(data['Zeros %']))
+        st.write('Negative :'+str(data['Negative']))
+        st.write('Negative % :'+str(data['Negative %']))
+        st.write('Is Text :'+str(data['Is Text']))
+        if data['High Correlation']:
+            st.write('High Correlation :'+str(data['High Correlation']))
+
 
     if column_name in gs.categorical_columns(df):
-        display_category_histogram(df, column_name, st)
+            display_category_histogram(df, column_name, st)
     elif column_name in gs.numerical_columns(df):
-        display_numeric_histogram(df, column_name,st)
+            display_numeric_histogram(df, column_name,st)
 
 
 def process_selection(option):
@@ -170,17 +185,26 @@ while create_report:
     correlation_matrix = cm.get_correlation_matrix(df)
     hcm = cm.find_correlated_columns(correlation_matrix)
     gs.write(st, df, hcm)
-    st.write("Variables:")
 
+    st.markdown(
+        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Variables:</h1>",
+        unsafe_allow_html=True
+    )
     data_dict = {column_name: column_name for column_name in gs.columns(df) if "_numeric" not in column_name}
 
-    selected_option = st.selectbox("Select a variable:", list(data_dict.keys()), key="select_variable")
+    selected_option = st.selectbox("", list(data_dict.keys()), key="select_variable")
     process_selection(selected_option)
 
-    st.write("Correlations:")
+    st.markdown(
+        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Correlations:</h1>",
+        unsafe_allow_html=True
+    )
     cm.display_correlation_matrix(correlation_matrix, st)
 
-    st.write("Interactions:")
+    st.markdown(
+        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Interactions:</h1>",
+        unsafe_allow_html=True
+    )
 
     selected_option_x = st.selectbox(
         "Select a column X:",
@@ -196,13 +220,30 @@ while create_report:
 
     selected_option_hue = st.selectbox(
         "Select a column 'hue':",
-        list(['']+[name for name in gs.categorical_columns(df) if "_numeric" not in name]),
+        list(['']+[name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name]),
         key="select_hue"
     )
 
-    if st.button("Click"):
+    st.markdown(
+        """
+        <style>
+        div.stButton > button {
+            width: 100%;
+            font-size: 16px; /* Adjust font size */
+            padding: 10px; /* Adjust padding */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button("Execute Graph"):
         cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
 
-    st.write("Missing values:")
+    st.markdown(
+        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Missing values:</h1>",
+        unsafe_allow_html=True
+    )
+
     m.missing_values_histogram(df,st)
     create_report = False
