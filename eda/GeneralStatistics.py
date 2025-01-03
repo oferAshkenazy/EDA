@@ -80,37 +80,78 @@ def check_uniform_column(df:pd.DataFrame,column_name):
 
 def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame):
     st.markdown(
-        "<h1 style='font-size: 30px; text-align: center; color: black;'>Overview</h1>",
+        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Overview</h1>",
         unsafe_allow_html=True
     )
 
     statistics, alerts = st.tabs(["Dataset Statistics", "Alerts"])
 
     with statistics:
-        st.header("Dataset statistics :")
-        st.write("Number of columns :",len(columns(df)))
-        st.write("Number of rows :",len(df))
-        st.write("Missing cells :",missing_cells(df))
-        st.write("Missing cells (%) :",round(missing_cells(df)/df.size*100,2))
-        st.write("Duplicate rows :",duplicate_rows(df))
-        st.write("Duplicate rows %:",round(duplicate_rows(df)/len(df),2))
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(
+            "<h2 style='font-size: 18px; text-align: center; color: green;'>Dataset statistics :</h2>",
+            unsafe_allow_html=True
+            )
+            st.write("Number of columns :",len(columns(df)))
+            st.write("Number of rows :",len(df))
+            st.write("Missing cells :",missing_cells(df))
+            st.write("Missing cells (%) :",round(missing_cells(df)/df.size*100,2))
+            st.write("Duplicate rows :",duplicate_rows(df))
+            st.write("Duplicate rows %:",round(duplicate_rows(df)/len(df),2))
 
-        st.header("Variable types:")
-        st.write("Numerical:", len(numerical_columns(df)))
-        st.write("Categorical:", len([column_name for column_name in categorical_columns(df) if '_numeric' not in column_name]))
-        st.write("Text:", len(string_columns(df)))
-        st.write("Boolean:", len(boolean_columns(df)))
-        st.write("Datetime :", len(datetime_columns(df)))
-        st.write("Timedelta :", len(timedelta_columns(df)))
-        st.write()
-        st.write("Total :",len([column_name for column_name in columns(df) if '_numeric' not in column_name]))
-        st.write("Total size in memory KB:", memory_size(df))
-        st.write("Average record size in memory KB: ", round(memory_size(df) / len(df), 2))
+        with col2:
+            st.markdown(
+                "<h2 style='font-size: 22px; text-align: center; color: green;'>Variable types: :</h2>",
+                unsafe_allow_html=True
+            )
+            st.write("Numerical:", len(numerical_columns(df)))
+            st.write("Categorical:", len([column_name for column_name in categorical_columns(df) if '_numeric' not in column_name]))
+            st.write("Text:", len(string_columns(df)))
+            st.write("Boolean:", len(boolean_columns(df)))
+            st.write("Datetime :", len(datetime_columns(df)))
+            st.write("Timedelta :", len(timedelta_columns(df)))
+            st.write()
+            st.write("Total :",len([column_name for column_name in columns(df) if '_numeric' not in column_name]))
+            st.write("Total size in memory KB:", memory_size(df))
+            st.write("Average record size in memory KB: ", round(memory_size(df) / len(df), 2))
 
     with alerts:
-        write_correlation_matrix_cells(st,hcm)
-        write_missing_values(st,df)
-        [st.write(column_name+ ' is uniformly distributed') for column_name in numerical_columns(df) if check_uniform_column(df,column_name)]
-        [st.write(column_name+ ' has unique values') for column_name in columns(df) if unique_column(df,column_name)]
-        [st.write(column_name+ ' has '+ str(zeros_column_sum(df,column_name)) + ' ('+ str(zeros_column_per(df,column_name))  +') Zeros') for column_name in numerical_columns(df) if zeros_column(df,column_name)]
+        st.markdown(
+            "<h2 style='font-size: 22px; text-align: center; color: red;'>Alerts :</h2>",
+            unsafe_allow_html=True
+        )
+        col3, col4 = st.columns(2)
+
+        with col3:
+            st.markdown(
+                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Correlation :</b></div>",
+                unsafe_allow_html=True
+            )
+            write_correlation_matrix_cells(st,hcm)
+
+            st.markdown(
+                "<div style='font-size: 18px; text-align: left; color:FireBrick;'><b>Missing :</b></div>",
+                unsafe_allow_html=True
+            )
+            write_missing_values(st,df)
+
+        with col4:
+            st.markdown(
+                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Uniformly :</b></div>",
+                unsafe_allow_html=True
+            )
+            [st.write(column_name+ ' is uniformly distributed') for column_name in numerical_columns(df) if check_uniform_column(df,column_name)]
+
+            st.markdown(
+                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Unique :</b></div>",
+                unsafe_allow_html=True
+            )
+            [st.write(column_name+ ' has unique values') for column_name in columns(df) if unique_column(df,column_name)]
+
+            st.markdown(
+                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Unique :</b></div>",
+                unsafe_allow_html=True
+            )
+            [st.write(column_name+ ' has '+ str(zeros_column_sum(df,column_name)) + ' ('+ str(zeros_column_per(df,column_name))  +') Zeros') for column_name in numerical_columns(df) if zeros_column(df,column_name)]
 

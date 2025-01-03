@@ -30,6 +30,24 @@ st.markdown(
         width: 100%;      /* Optional: Adjust table width */
     }
     
+    /* Custom style for the active tab */
+    .stTabs > .tablist > .react-tabs__tab--selected {
+        background-color: #0e1117;
+        color: #ffffff;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    /* Custom style for all tabs */
+    .stTabs > .tablist > .react-tabs__tab {
+        background-color: #e8e8e8;
+        color: #4f4f4f;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    button div p {
+    /* CSS styles for <p> inside a <div> */
+    font-size: 18px !important;
+    font-weight: bold;
+    color: purple;
+}
     </style>
     """,
     unsafe_allow_html=True,
