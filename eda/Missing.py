@@ -3,8 +3,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def missing_values_histogram(df:pd.DataFrame,st:streamlit):
-    data=[{column:df[column].value_counts().sum()} for column in df.columns]
+def missing_values_histogram(df:pd.DataFrame,st:streamlit,original_columns):
+    data=[{column:df[column].value_counts().sum()} for column in original_columns ]
     # Convert the list of dictionaries to a DataFrame
     formatted_data = pd.DataFrame([{name:count for single_data in data for name, count in single_data.items()}]).T.reset_index()
     formatted_data.columns = ['Column', 'Count']

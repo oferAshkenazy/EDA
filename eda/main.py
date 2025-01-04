@@ -163,11 +163,20 @@ def process_selection(option,hcm):
         result = cs.analyze_column(df, option,hcm)
         write_column_data(option,result)
 
+def remove_numeric_suffix(name):
+        return name.replace("_numeric", "")
+
 def create_report():
     original_columns = df.columns
 
     correlation_matrix = cm.get_correlation_matrix(df)
     hcm = cm.find_correlated_columns(correlation_matrix)
+
+    #Rename both columns and rows
+    correlation_matrix = correlation_matrix.rename(
+        columns=lambda x: remove_numeric_suffix(x),
+        index=lambda x: remove_numeric_suffix(x)
+    )
 
     st.markdown(
         "<h1 style='font-size: 30px; text-align: center; color: blue;'>Overview:</h1>",
@@ -234,7 +243,7 @@ def create_report():
         unsafe_allow_html=True
     )
 
-    m.missing_values_histogram(df,st)
+    m.missing_values_histogram(df,st,original_columns)
 
 if uploaded_file is not None:
     # Handle CSV file
