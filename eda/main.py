@@ -129,15 +129,15 @@ def write_column_data(column_name,data):
     col5,col6 = st.columns(2)
 
     with col5:
-        if data['Unique']:
-            st.write('Distinct :'+str(data['Unique Count']))
-            st.write('Distinct (%):'+str(data['Unique %']))
+        #if data['Unique']:
+        st.write('Distinct :'+str(data['Unique Count']))
+        st.write('Distinct (%):'+str(data['Unique %']))
 
         if data['Missing']:
             st.write('Missing :'+str(data['Missing Count']))
             st.write('Missing %:'+str(round(data['Missing %'],2)))
 
-        st.write('Mean :'+str(data['Mean']))
+        st.write('Mean :'+str(round(data['Mean'],5)))
         st.write('Median :'+str(data['Median']))
         st.write('Minimum :'+str(data['Minimum']))
         st.write('Maximum :'+str(data['Maximum']))
@@ -197,13 +197,13 @@ def create_report():
 
     selected_option_x = st.selectbox(
         "Select a column X:",
-        list(get_original_columns()),
+        list([original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])]),
         key="select_x"
     )
 
     selected_option_y = st.selectbox(
         "Select a column Y:",
-        list(get_original_columns()),
+        list([original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])]),
         key="select_y"
     )
 

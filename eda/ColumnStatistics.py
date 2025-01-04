@@ -33,23 +33,7 @@ def minimum_column(df,column_name):
     return df[column_name].min()
   else:
     return 0
-'''
-def analyze_correlation(column_name):
-  correlation=list()
-  for column in correlation_matrix.columns:
-    if (column_name in correlation_matrix.columns):
-      if (abs(correlation_matrix.loc[column_name,column])>correlation_threshold() and column!=column_name):
-        correlation.append([column_name,column])
 
-  return correlation
-
-def print_correlation(correlation):
-  text=str()
-  for item in correlation:
-    text+="  " + item[0].replace('_numeric','') + " has high correlation with " + item[1].replace('_numeric','')
-
-  return text
-'''
 def check_correlation(column_name,correlation):
   for item in correlation:
     if item[0].replace('_numeric','')==column_name or item[1].replace('_numeric','')==column_name:
@@ -83,6 +67,9 @@ def column_type(df,column_name):
     if column_name in gs.datetime_columns(df):
         type_list.append('Datetime')
 
+    if len(type_list)==0:
+        type_list.append('Text')
+
     return type_list
 
 def analyze_column(df, column_name,hcm):
@@ -97,8 +84,8 @@ def analyze_column(df, column_name,hcm):
         'Missing Count': int(df[column_name].isnull().sum()),  # Count of missing values
         'Mean': mean_column(df,column_name),  # Mean value
         'Median': median_column(df,column_name),  # Median value
-        'Minimum': int(minimum_column(df,column_name)),  # Minimum value
-        'Maximum': int(maximum_column(df,column_name)),  #data st Maximum value
+        'Minimum': float(minimum_column(df,column_name)),  # Minimum value
+        'Maximum': float(maximum_column(df,column_name)),  #data st Maximum value
         'Standard Deviation': round(standard_deviation_column(df,column_name),2),  # Standard deviation
         'Zeros': int((df[column_name] == 0).sum()),
         'Zeros %': round(((df[column_name] == 0).sum() / len(df[column_name])) * 100,2),
