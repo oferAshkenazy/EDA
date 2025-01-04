@@ -7,7 +7,7 @@ def replace_numeric(name):
   return str(name).replace('_numeric','')
 
 def unique_threshold_column():
-    return 5
+    return 10
 
 def correlation_threshold():
     return 0.5

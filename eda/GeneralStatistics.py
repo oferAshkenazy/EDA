@@ -59,6 +59,9 @@ def columns(df):
 def duplicate_rows(df):
     return df.duplicated().sum()
 
+def duplicate_rows_per(df):
+    return (duplicate_rows(df)/len(df))*100
+
 def write_correlation_matrix_cells(st:streamlit, hcm):
     for i in range(len(hcm)):
         st.write(hcm[i][0].replace('_numeric','') + ' is highly overall correlated with ' + hcm[i][1].replace('_numeric',''))
@@ -101,7 +104,7 @@ def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame,original_columns:list):
             st.write("Missing cells :",missing_cells(df))
             st.write("Missing cells (%) :",round(missing_cells_per(df,original_columns),2))
             st.write("Duplicate rows :",duplicate_rows(df))
-            st.write("Duplicate rows %:",round(duplicate_rows(df)/len(df),2))
+            st.write(f"Duplicate rows percentage:{duplicate_rows_per(df):.2f}%")
 
         with col2:
             st.markdown(
@@ -128,34 +131,39 @@ def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame,original_columns:list):
 
         with col3:
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Correlation :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: Crimson;'><b>Correlation :</b></div><br/>",
                 unsafe_allow_html=True
             )
             write_correlation_matrix_cells(st,hcm)
 
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color:FireBrick;'><b>Missing :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color:FireBrick;'><b>Missing :</b></div><br/>",
                 unsafe_allow_html=True
             )
             write_missing_values(st,df)
 
         with col4:
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: DarkRed;'><b>Uniformly :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: DarkRed;'><b>Uniformly :</b></div><br/>",
                 unsafe_allow_html=True
             )
             [st.write(column_name+ ' is uniformly distributed') for column_name in numerical_columns(df) if check_uniform_column(df,column_name)]
 
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: DarkOrange ;'><b>Unique :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: DarkOrange ;'><b>Unique :</b></div><br/>",
                 unsafe_allow_html=True
             )
             [st.write(column_name+ ' has unique values') for column_name in columns(df) if unique_column(df,column_name)]
 
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: Tomato;'><b>Zeros :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: Tomato;'><b>Zeros :</b></div><br/>",
                 unsafe_allow_html=True
             )
 
             [st.write(column_name+ ' has '+ str(zeros_column_sum(df,column_name)) + ' ('+ str(zeros_column_per(df,column_name))  +') Zeros') for column_name in numerical_columns(df) if zeros_column(df,column_name)]
 
+            st.markdown(
+                "<div style='font-size: 18px; text-align: left; color: DarkRed;'><b>Duplicates :</b></div><br/>",
+                unsafe_allow_html=True
+            )
+            st.write(str(duplicate_rows(df)) + " rows ",f"{duplicate_rows_per(df):.2f}%")
