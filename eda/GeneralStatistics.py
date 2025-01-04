@@ -40,8 +40,15 @@ def timedelta_columns(df):
 
 def non_numerical_cols(df):
     return df.select_dtypes(exclude='number')
+
 def missing_cells(df):
     return df.isnull().sum().sum()
+
+def missing_cells_per(df,original_columns):
+    total_cells=len(df)*len(original_columns)
+    total_missing_cells =missing_cells(df)
+
+    return (total_missing_cells / total_cells) * 100
 
 def memory_size(df):
     return df.memory_usage(deep=True).sum()/1024
@@ -78,12 +85,7 @@ def check_uniform_column(df:pd.DataFrame,column_name):
     else:
         return False
 
-def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame):
-    st.markdown(
-        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Overview</h1>",
-        unsafe_allow_html=True
-    )
-
+def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame,original_columns:list):
     statistics, alerts = st.tabs(["Dataset Statistics", "Alerts"])
 
     with statistics:
@@ -93,10 +95,11 @@ def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame):
             "<h2 style='font-size: 18px; text-align: center; color: green;'>Dataset statistics :</h2>",
             unsafe_allow_html=True
             )
-            st.write("Number of columns :",len(columns(df)))
+
+            st.write("Number of columns :",len(original_columns))
             st.write("Number of rows :",len(df))
             st.write("Missing cells :",missing_cells(df))
-            st.write("Missing cells (%) :",round(missing_cells(df)/df.size*100,2))
+            st.write("Missing cells (%) :",round(missing_cells_per(df,original_columns),2))
             st.write("Duplicate rows :",duplicate_rows(df))
             st.write("Duplicate rows %:",round(duplicate_rows(df)/len(df),2))
 
@@ -150,7 +153,7 @@ def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame):
             [st.write(column_name+ ' has unique values') for column_name in columns(df) if unique_column(df,column_name)]
 
             st.markdown(
-                "<div style='font-size: 18px; text-align: left; color: Tomato;'><b>Unique :</b></div>",
+                "<div style='font-size: 18px; text-align: left; color: Tomato;'><b>Zeros :</b></div>",
                 unsafe_allow_html=True
             )
 

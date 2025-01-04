@@ -10,7 +10,6 @@ import GeneralStatistics as gs
 import Missing as m
 
 df=pd.DataFrame|None
-create_report=False
 selected_option_y=str|None
 selected_option_x=str|None
 original_columns=list()
@@ -64,19 +63,6 @@ def get_dataframe():
 
 def get_file():
     return uploaded_file
-
-if uploaded_file is not None:
-    # Handle CSV file
-    if uploaded_file.name.endswith(".csv"):
-        df = pd.read_csv(uploaded_file)
-        st.write("Data from CSV file:")
-        st.markdown(
-            df.head().to_html(classes="dataframe-table", index=False),
-            unsafe_allow_html=True,
-        )
-        create_report=True
-else:
-    st.write("No file uploaded yet!")
 
 def display_category_histogram(df,column_name,st:streamlit):
     # Calculate the counts of each category
@@ -173,18 +159,21 @@ def write_column_data(column_name,data):
             display_numeric_histogram(df, column_name,st)
 
 
-def process_selection(option):
+def process_selection(option,hcm):
         result = cs.analyze_column(df, option,hcm)
         write_column_data(option,result)
 
+def create_report():
+    original_columns = df.columns
 
-
-# Main logic
-while create_report:
-    original_columns=df.columns
     correlation_matrix = cm.get_correlation_matrix(df)
     hcm = cm.find_correlated_columns(correlation_matrix)
-    gs.write(st, df, hcm)
+
+    st.markdown(
+        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Overview:</h1>",
+        unsafe_allow_html=True
+    )
+    gs.write(st, df, hcm,original_columns)
 
     st.markdown(
         "<h1 style='font-size: 30px; text-align: center; color: blue;'>Variables:</h1>",
@@ -193,7 +182,7 @@ while create_report:
     data_dict = {column_name: column_name for column_name in gs.columns(df) if "_numeric" not in column_name}
 
     selected_option = st.selectbox("", list(data_dict.keys()), key="select_variable")
-    process_selection(selected_option)
+    process_selection(selected_option,hcm)
 
     st.markdown(
         "<h1 style='font-size: 30px; text-align: center; color: blue;'>Correlations:</h1>",
@@ -246,4 +235,17 @@ while create_report:
     )
 
     m.missing_values_histogram(df,st)
-    create_report = False
+
+if uploaded_file is not None:
+    # Handle CSV file
+    if uploaded_file.name.endswith(".csv"):
+        df = pd.read_csv(uploaded_file)
+        st.write("Data from CSV file:")
+        st.markdown(
+            df.head().to_html(classes="dataframe-table", index=False),
+            unsafe_allow_html=True,
+        )
+        create_report()
+else:
+    st.write("No file uploaded yet!")
+
