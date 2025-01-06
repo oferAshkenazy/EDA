@@ -167,3 +167,4 @@ def write(st:streamlit,df:pd.DataFrame,hcm:pd.DataFrame,original_columns:list):
                 unsafe_allow_html=True
             )
             st.write(str(duplicate_rows(df)) + " rows ",f"{duplicate_rows_per(df):.2f}%")
+

@@ -166,6 +166,23 @@ def process_selection(option,hcm):
 def remove_numeric_suffix(name):
         return name.replace("_numeric", "")
 
+def display_category_graph(df,st,colX,colY):
+    fig1 = sns.catplot(data=df, x=colX, y=colY, kind='bar', errorbar='sd')
+    fig1.set_titles("Average " + colX + " by " + colY + " [Error bars are std]")
+    st.pyplot(fig1)
+
+    # Scatter plot with transparency
+    fig2 = sns.catplot(data=df, x=colX, y=colY, alpha=0.3)
+    st.pyplot(fig2)
+
+    # Box plot
+    fig3 = sns.catplot(data=df, x=colX, y=colY, kind='box')
+    st.pyplot(fig3)
+
+    # Violin plot
+    fig4 = sns.catplot(data=df, x=colX, y=colY, kind='violin')
+    st.pyplot(fig4)
+
 def create_report():
     original_columns = df.columns
 
@@ -204,23 +221,30 @@ def create_report():
         unsafe_allow_html=True
     )
 
-    selected_option_x = st.selectbox(
-        "Select a column X:",
-        list([original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])]),
-        key="select_x"
-    )
+    select_box_data = list(
+        [original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])])
 
-    selected_option_y = st.selectbox(
-        "Select a column Y:",
-        list([original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])]),
-        key="select_y"
-    )
+    with st.spinner():
+        selected_option_x = st.selectbox(
+            "Select a column X:",
+            select_box_data,
+            key="select_x"
+        )
 
-    selected_option_hue = st.selectbox(
-        "Select a column 'hue':",
-        list(['']+[name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name]),
-        key="select_hue"
-    )
+        selected_option_y = st.selectbox(
+            "Select a column Y:",
+            select_box_data,
+            key="select_y"
+        )
+
+    select_box_hue=list(['']+[name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name])
+
+    with st.spinner():
+        selected_option_hue = st.selectbox(
+                "Select a column 'hue':",
+                select_box_hue,
+                key="select_hue"
+        )
 
     st.markdown(
         """
@@ -235,8 +259,34 @@ def create_report():
         unsafe_allow_html=True,
     )
 
-    if st.button("Execute Graph"):
-        cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
+    with st.spinner():
+        if st.button("Execute Interactions Graph"):
+            cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
+
+    st.markdown(
+        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Category graphs:</h1>",
+        unsafe_allow_html=True
+    )
+    select_box_category_data=list([original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])])
+    select_box_category_columns=list([name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name])
+
+    with st.spinner():
+        selected_option_cat_x = st.selectbox(
+            "Select a column X:",
+            select_box_category_columns,
+            key="select_cat_x"
+        )
+
+    with st.spinner():
+        selected_option_cat_y = st.selectbox(
+            "Select a column Y:",
+            select_box_category_data,
+            key="select_cat_ y"
+        )
+
+    with st.spinner():
+        if st.button("Execute Category Graphs"):
+            display_category_graph(df, st, selected_option_cat_x, selected_option_cat_y)
 
     st.markdown(
         "<h1 style='font-size: 30px; text-align: center; color: blue;'>Missing values:</h1>",
@@ -244,6 +294,10 @@ def create_report():
     )
 
     m.missing_values_histogram(df,st,original_columns)
+
+
+
+
 
 if uploaded_file is not None:
     # Handle CSV file

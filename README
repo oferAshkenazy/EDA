@@ -7,5 +7,6 @@ EDA Tutorial
     4.2 Alerts tab shows data on columns : Correlation,Uniformly ,Unique ,Zeros ,Duplicates and Missing .
 5. Variables where data and graph on selected column is displayed.
 6. Correlations shows Heat Map/Table and graph
-7. Interactions shows scatter plot graph by picking : x/y cols and hue.
-8. Missing values : histogram of missing values (if any) per column.
+7. Interactions shows scatter plot graph by picking : x/y columns and hue.
+8. Category shows catplot graphs by picking :x/y columns
+9. Missing values : histogram of missing values (if any) per column.

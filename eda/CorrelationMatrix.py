@@ -71,8 +71,10 @@ def display_correlation_matrix(correlation_matrix,st:streamlit):
     with graphs:
         display_correlation_graph(st,correlation_matrix)
 
+
 def display_interactions_plot(df,st,col_x,col_y,col_hue):
     plt.figure(figsize=(6, 4))
+
     if len(col_hue)==0:
         sns.scatterplot(x=col_x, y=col_y, data=df)
     else:
@@ -82,6 +84,5 @@ def display_interactions_plot(df,st,col_x,col_y,col_hue):
     plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0)
     plt.xticks(fontsize=12)  # X-axis tick labels font size
     plt.yticks(fontsize=12)  # Y-axis tick labels font size
-
-    #plt.tight_layout()
+    plt.tight_layout()
     st.pyplot(plt)
