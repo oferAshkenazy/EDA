@@ -289,6 +289,7 @@ def create_report(df):
     select_box_category_columns = list(
         [name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name])
 
+
     if len(select_box_category_data)>0 and len(select_box_category_columns)>0:
         st.markdown(
             "<h1 style='font-size: 30px; text-align: center; color: blue;'>Category graphs:</h1>",
