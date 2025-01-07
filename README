@@ -1,6 +1,6 @@
 EDA Tutorial
 1. Using the following URL "https://f2xtjiotkmwsbxjqoasgfk.streamlit.app/" to load the app
-2. On the main homepage Drag or Upload CSV file with DATA
+2. On the main homepage choose a seaborn dataset OR Drag/Upload CSV file with DATA
 3. The first 5 rows from the file will be shown
 4. The "OVERVIEW" section is next
     4.1 Dataset statistics tab shows general stats like : number of cols/rows,missing data ,duplicates rows and etc.

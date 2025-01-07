@@ -3,6 +3,8 @@ import pandas as pd
 import seaborn as sns
 import streamlit
 import streamlit as st
+from numpy.matlib import empty
+import numpy as np
 
 import ColumnStatistics as cs
 import CorrelationMatrix as cm
@@ -13,6 +15,7 @@ df=pd.DataFrame|None
 selected_option_y=str|None
 selected_option_x=str|None
 original_columns=list()
+seaborn_or_csv=str|None
 
 st.markdown(
     """
@@ -52,8 +55,17 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.text("choose csv file")
-uploaded_file = st.file_uploader("Choose a file", type=["csv"])
+
+def get_seaborn_datasets():
+    try:
+        sns_datasets = sns.get_dataset_names()
+    except AttributeError:
+        sns_datasets = []  # Fallback if the version doesn't support this
+    return sns_datasets
+
+# Load dataset based on user selection
+def load_dataset(dataset_name):
+    return sns.load_dataset(dataset_name)
 
 def get_original_columns():
     return original_columns
@@ -183,7 +195,12 @@ def display_category_graph(df,st,colX,colY):
     fig4 = sns.catplot(data=df, x=colX, y=colY, kind='violin')
     st.pyplot(fig4)
 
-def create_report():
+
+def create_report(df):
+    st.markdown(
+        df.head().to_html(classes="dataframe-table", index=False),
+        unsafe_allow_html=True,
+    )
     original_columns = df.columns
 
     correlation_matrix = cm.get_correlation_matrix(df)
@@ -207,14 +224,17 @@ def create_report():
     )
     data_dict = {column_name: column_name for column_name in gs.columns(df) if "_numeric" not in column_name}
 
-    selected_option = st.selectbox("", list(data_dict.keys()), key="select_variable")
+    selected_option = st.selectbox("", list(data_dict.keys()), key="select_variable"+seaborn_or_csv)
     process_selection(selected_option,hcm)
 
-    st.markdown(
-        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Correlations:</h1>",
-        unsafe_allow_html=True
-    )
-    cm.display_correlation_matrix(correlation_matrix, st)
+    arr = np.array([correlation_matrix])  # Example of an empty array
+
+    if arr.size != 0:
+        st.markdown(
+            "<h1 style='font-size: 30px; text-align: center; color: blue;'>Correlations:</h1>",
+            unsafe_allow_html=True
+        )
+        cm.display_correlation_matrix(correlation_matrix, st)
 
     st.markdown(
         "<h1 style='font-size: 30px; text-align: center; color: blue;'>Interactions:</h1>",
@@ -223,70 +243,75 @@ def create_report():
 
     select_box_data = list(
         [original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])])
+    if len(select_box_data)>0:
+        with st.spinner():
+            selected_option_x = st.selectbox(
+                "Select a column X:",
+                select_box_data,
+                key="select_x"+seaborn_or_csv
+            )
 
-    with st.spinner():
-        selected_option_x = st.selectbox(
-            "Select a column X:",
-            select_box_data,
-            key="select_x"
+            selected_option_y = st.selectbox(
+                "Select a column Y:",
+                select_box_data,
+                key="select_y"+seaborn_or_csv
+            )
+
+        select_box_hue=list(['']+[name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name])
+
+        with st.spinner():
+                selected_option_hue = st.selectbox(
+                        "Select a column 'hue':",
+                        select_box_hue,
+                        key="select_hue"+seaborn_or_csv
+                )
+
+        st.markdown(
+            """
+            <style>
+            div.stButton > button {
+                width: 100%;
+                font-size: 16px; /* Adjust font size */
+                padding: 10px; /* Adjust padding */
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
         )
 
-        selected_option_y = st.selectbox(
-            "Select a column Y:",
-            select_box_data,
-            key="select_y"
+        with st.spinner():
+            if selected_option_x is not None and selected_option_y is not None and st.button("Execute Interactions Graph",key="EIG_"+seaborn_or_csv):
+                cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
+
+    select_box_category_data = list(
+    [original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])])
+
+    select_box_category_columns = list(
+        [name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name])
+
+    if len(select_box_category_data)>0 and len(select_box_category_columns)>0:
+        st.markdown(
+            "<h1 style='font-size: 30px; text-align: center; color: blue;'>Category graphs:</h1>",
+            unsafe_allow_html=True
         )
 
-    select_box_hue=list(['']+[name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name])
+        with st.spinner():
+            selected_option_cat_x = st.selectbox(
+                "Select a column X:",
+                select_box_category_columns,
+                key="select_cat_x"+seaborn_or_csv
+            )
 
-    with st.spinner():
-        selected_option_hue = st.selectbox(
-                "Select a column 'hue':",
-                select_box_hue,
-                key="select_hue"
-        )
+        with st.spinner():
+            selected_option_cat_y = st.selectbox(
+                "Select a column Y:",
+                select_box_category_data,
+                key="select_cat_ y"+seaborn_or_csv
+            )
 
-    st.markdown(
-        """
-        <style>
-        div.stButton > button {
-            width: 100%;
-            font-size: 16px; /* Adjust font size */
-            padding: 10px; /* Adjust padding */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    with st.spinner():
-        if st.button("Execute Interactions Graph"):
-            cm.display_interactions_plot(df, st, selected_option_x, selected_option_y,selected_option_hue)
-
-    st.markdown(
-        "<h1 style='font-size: 30px; text-align: center; color: blue;'>Category graphs:</h1>",
-        unsafe_allow_html=True
-    )
-    select_box_category_data=list([original_column for original_column in original_columns if pd.api.types.is_numeric_dtype(df[original_column])])
-    select_box_category_columns=list([name for name in gs.categorical_columns(df) if "_numeric" not in name and "Binned" not in name])
-
-    with st.spinner():
-        selected_option_cat_x = st.selectbox(
-            "Select a column X:",
-            select_box_category_columns,
-            key="select_cat_x"
-        )
-
-    with st.spinner():
-        selected_option_cat_y = st.selectbox(
-            "Select a column Y:",
-            select_box_category_data,
-            key="select_cat_ y"
-        )
-
-    with st.spinner():
-        if st.button("Execute Category Graphs"):
-            display_category_graph(df, st, selected_option_cat_x, selected_option_cat_y)
+        with st.spinner():
+            if selected_option_cat_x is not None and st.button("Execute Category Graphs", key="ECG_" + seaborn_or_csv):
+                display_category_graph(df, st, selected_option_cat_x, selected_option_cat_y)
 
     st.markdown(
         "<h1 style='font-size: 30px; text-align: center; color: blue;'>Missing values:</h1>",
@@ -295,20 +320,34 @@ def create_report():
 
     m.missing_values_histogram(df,st,original_columns)
 
+seaborn_tab,csv_tab=st.tabs(["Seaborn","CSV"])
 
+with seaborn_tab:
+    st.title("Load Seaborn Datasets")
 
+    # Dropdown to select dataset
+    available_datasets = get_seaborn_datasets()
+    selected_dataset = st.selectbox("Choose a Seaborn dataset to load:", available_datasets)
 
+    if selected_dataset:
+        # Load and display dataset
+        with st.spinner("Loading dataset..."):
+            df = load_dataset(selected_dataset)
+            seaborn_or_csv='seaborn'
+        st.success(f"Loaded dataset: {selected_dataset}")
+        create_report(df)
 
-if uploaded_file is not None:
-    # Handle CSV file
-    if uploaded_file.name.endswith(".csv"):
-        df = pd.read_csv(uploaded_file)
-        st.write("Data from CSV file:")
-        st.markdown(
-            df.head().to_html(classes="dataframe-table", index=False),
-            unsafe_allow_html=True,
-        )
-        create_report()
-else:
-    st.write("No file uploaded yet!")
+with csv_tab:
+    st.title(" choose csv file")
+    uploaded_file = st.file_uploader("Choose a file", type=["csv"])
+
+    if uploaded_file is not None:
+        # Handle CSV file
+        if uploaded_file.name.endswith(".csv"):
+            df = pd.read_csv(uploaded_file)
+            st.write("Data from CSV file:")
+            seaborn_or_csv='csv'
+            create_report(df)
+    else:
+        st.write("No file uploaded yet!")
 
