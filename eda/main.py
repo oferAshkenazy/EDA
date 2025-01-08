@@ -5,7 +5,6 @@ import streamlit
 import streamlit as st
 from numpy.matlib import empty
 import numpy as np
-
 import ColumnStatistics as cs
 import CorrelationMatrix as cm
 import GeneralStatistics as gs
@@ -64,7 +63,7 @@ def get_seaborn_datasets():
     return sns_datasets
 
 # Load dataset based on user selection
-def load_dataset(dataset_name):
+def load_dataset(dataset_name:str):
     return sns.load_dataset(dataset_name)
 
 def get_original_columns():
@@ -93,7 +92,6 @@ def display_category_histogram(df,column_name,st:streamlit):
     # Show the plot
     st.pyplot(plt)
 
-
 def display_numeric_histogram(df,column_name,st:streamlit):
     calculated_bin= int(df[column_name].max()/20)
     if calculated_bin == 0:
@@ -119,7 +117,6 @@ def display_numeric_histogram(df,column_name,st:streamlit):
     plt.xticks(rotation=45)
     # Show the plot
     st.pyplot(plt)
-
 
 def write_column_data(column_name,data):
     types = ''
@@ -170,7 +167,6 @@ def write_column_data(column_name,data):
     elif column_name in gs.numerical_columns(df):
             display_numeric_histogram(df, column_name,st)
 
-
 def process_selection(option,hcm):
         result = cs.analyze_column(df, option,hcm)
         write_column_data(option,result)
@@ -194,7 +190,6 @@ def display_category_graph(df,st,colX,colY):
     # Violin plot
     fig4 = sns.catplot(data=df, x=colX, y=colY, kind='violin')
     st.pyplot(fig4)
-
 
 def create_report(df):
     st.markdown(

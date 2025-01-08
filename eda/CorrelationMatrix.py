@@ -26,7 +26,6 @@ def add_convertible_columns_as_numeric(df):
 
     return df
 
-
 def create_correlation_matrix(df):
     #df = add_convertible_columns_as_numeric(df)
     df_corr = add_convertible_columns_as_numeric(df)
@@ -70,7 +69,6 @@ def display_correlation_matrix(correlation_matrix,st:streamlit):
 
     with graphs:
         display_correlation_graph(st,correlation_matrix)
-
 
 def display_interactions_plot(df,st,col_x,col_y,col_hue):
     plt.figure(figsize=(6, 4))
